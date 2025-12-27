@@ -34,5 +34,14 @@ Day 4: Streak logic & polish UI implemented. Behavior:
 How to test Day 4:
 
 - Reload the extension.
+
+Day 5: Test & local packaging
+
+- Run quick validation: `node scripts/validate.js` (no deps). This checks basic manifest/rules/blocked page structure.
+- Manual test checklist and packaging instructions are in `TESTING.md`.
+
+Packaging locally:
+
+- Create a zip of the `extension/` folder for sharing or local load: `cd extension && zip -r ../focusguard.zip .`
 - To simulate a block: visit a blocked domain; `currentStreak` should be reset to 0 and `lastBlockedDate` set to today.
 - To simulate a day with no blocks: manually set `lastBlockedDate` in `chrome.storage.local` to a date earlier than yesterday, then run `chrome.alarms.clear('daily-streak')` and `chrome.alarms.create('daily-streak', {when: Date.now() + 1000})` in the background console (or wait a day). After the alarm runs, `currentStreak` should increment and `streakLastUpdatedDate` should be set to yesterday.

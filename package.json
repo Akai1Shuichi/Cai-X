@@ -1,0 +1,9 @@
+{
+  "name": "focusguard-extension",
+  "version": "0.1.0",
+  "description": "FocusGuard MVP extension — local dev scripts",
+  "scripts": {
+    "validate": "node scripts/validate.js",
+    "test": "npm run validate"
+  }
+}
