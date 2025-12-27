@@ -3,7 +3,7 @@
   "name": "FocusGuard - Minimal MVP",
   "version": "0.1.0",
   "description": "Create friction to help you resist visiting sites you want to avoid.",
-  "permissions": ["storage", "declarativeNetRequest"],
+  "permissions": ["storage", "declarativeNetRequest", "alarms"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"

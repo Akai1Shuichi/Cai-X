@@ -4,7 +4,7 @@
     "priority": 1,
     "action": {
       "type": "redirect",
-      "redirect": { "extensionPath": "/blocked.html" }
+      "redirect": { "extensionPath": "/blocked.html?hit=1" }
     },
     "condition": {
       "urlFilter": "||pornhub.com^",
@@ -16,7 +16,7 @@
     "priority": 1,
     "action": {
       "type": "redirect",
-      "redirect": { "extensionPath": "/blocked.html" }
+      "redirect": { "extensionPath": "/blocked.html?hit=1" }
     },
     "condition": {
       "urlFilter": "||xvideos.com^",
@@ -28,7 +28,7 @@
     "priority": 1,
     "action": {
       "type": "redirect",
-      "redirect": { "extensionPath": "/blocked.html" }
+      "redirect": { "extensionPath": "/blocked.html?hit=1" }
     },
     "condition": {
       "urlFilter": "||xhamster.com^",

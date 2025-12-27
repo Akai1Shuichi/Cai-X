@@ -1,4 +1,4 @@
-// Blocked page logic (Day 2): increment violationCount, reset streak for today, store lastBlockedDate, and improve UI
+// blocked.js — FIX reload bị tính thêm
 function todayStr() {
   const d = new Date();
   return (
@@ -10,67 +10,67 @@ function todayStr() {
   );
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+// chỉ count nếu có hit=1 từ redirect và có referrer hợp lệ (tránh reload trực tiếp)
+function isRealBlockedHit() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("hit") !== "1") return false;
+  const ref = document.referrer || "";
+  if (!ref) return false; // direct open or reload without referrer
+  // ignore extension/internal referrers
+  if (
+    ref.startsWith("chrome-extension://") ||
+    ref.startsWith("chrome://") ||
+    ref.startsWith("about:")
+  )
+    return false;
+  return true;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
   chrome.storage.local.get(
     ["violationCount", "currentStreak", "lastBlockedDate"],
-    function (res) {
-      var count = (res.violationCount || 0) + 1;
-      var today = todayStr();
+    (res) => {
+      let count = res.violationCount || 0;
+      let streak = res.currentStreak || 0;
+      const today = todayStr();
 
-      // On a blocked attempt, reset streak
-      var newStreak = 0;
+      // ✅ CHỈ TĂNG KHI TRUY CẬP TRANG CẤM
+      if (isRealBlockedHit()) {
+        count += 1;
+        streak = 0;
 
-      chrome.storage.local.set(
-        {
+        chrome.storage.local.set({
           violationCount: count,
-          currentStreak: newStreak,
+          currentStreak: streak,
           lastBlockedDate: today,
-          streakLastUpdatedDate: today,
-        },
-        function () {
-          var el = document.getElementById("count");
-          if (el) el.textContent = count;
+        });
+      }
 
-          var stEl = document.getElementById("streak");
-          if (stEl) stEl.textContent = newStreak;
+      // Render UI
+      const c = document.getElementById("count");
+      if (c) c.textContent = count;
 
-          var lastEl = document.getElementById("last");
-          if (lastEl) lastEl.textContent = "📅 Lần gần nhất: " + today;
-        }
-      );
+      const s = document.getElementById("streak");
+      if (s) s.textContent = streak;
 
-      // Try to show attempted page (may be available via document.referrer)
-      var ref = document.referrer || "";
+      const l = document.getElementById("last");
+      if (l && res.lastBlockedDate) {
+        l.textContent = "📅 Lần gần nhất: " + res.lastBlockedDate;
+      }
+
+      // Hiển thị domain bị chặn (nếu có)
+      const ref = document.referrer;
       if (ref) {
         try {
-          var host = new URL(ref).host.replace("www.", "");
-          var note = document.getElementById("note");
-          if (note)
-            note.textContent =
-              "Bạn đã cố truy cập: " +
-              host +
-              " — chúng tôi đã ghi lại lần này.";
-        } catch (e) {
-          // ignore parse errors
-        }
+          const host = new URL(ref).hostname.replace("www.", "");
+          const note = document.getElementById("note");
+          if (note) note.textContent = "Bạn vừa cố truy cập: " + host;
+        } catch (_) {}
       }
     }
   );
 
-  // Back button closes the tab
-  var btn = document.getElementById("back");
-  if (btn)
-    btn.addEventListener("click", function () {
-      window.close();
-    });
-
-  // Start focus session button just closes and sets a flag (Day 4 we'll add timers)
-  var focusBtn = document.getElementById("start-focus");
-  if (focusBtn)
-    focusBtn.addEventListener("click", function () {
-      focusBtn.textContent = "Đang bắt đầu…";
-      setTimeout(() => {
-        window.close();
-      }, 600);
-    });
+  // nút quay lại
+  const backBtn = document.getElementById("back");
+  if (backBtn) backBtn.addEventListener("click", () => window.close());
 });

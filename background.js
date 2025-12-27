@@ -6,7 +6,10 @@ function makeRule(id, domain) {
   return {
     id: id,
     priority: 1,
-    action: { type: "redirect", redirect: { extensionPath: "/blocked.html" } },
+    action: {
+      type: "redirect",
+      redirect: { extensionPath: "/blocked.html?hit=1" },
+    },
     condition: {
       urlFilter: "||" + domain + "^",
       resourceTypes: ["main_frame"],
