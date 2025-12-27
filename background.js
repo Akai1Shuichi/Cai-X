@@ -31,7 +31,7 @@ async function ensureStorage() {
         "lastBlockedDate",
         "userBlockedDomains",
         "dynamicRules",
-        "streakLastUpdatedDate"
+        "streakLastUpdatedDate",
       ],
       (res) => {
         const toSet = {};
@@ -43,7 +43,8 @@ async function ensureStorage() {
           toSet.userBlockedDomains = [];
         if (typeof res.dynamicRules !== "object" || res.dynamicRules === null)
           toSet.dynamicRules = {};
-        if (typeof res.streakLastUpdatedDate === 'undefined') toSet.streakLastUpdatedDate = null;
+        if (typeof res.streakLastUpdatedDate === "undefined")
+          toSet.streakLastUpdatedDate = null;
         if (Object.keys(toSet).length)
           chrome.storage.local.set(toSet, () => resolve());
         else resolve();
@@ -75,50 +76,71 @@ async function restoreDynamicRules() {
 
 function todayStr() {
   const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  return (
+    d.getFullYear() +
+    "-" +
+    String(d.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(d.getDate()).padStart(2, "0")
+  );
 }
 
 function yesterdayStr() {
   const d = new Date();
   d.setDate(d.getDate() - 1);
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  return (
+    d.getFullYear() +
+    "-" +
+    String(d.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(d.getDate()).padStart(2, "0")
+  );
 }
 
 function checkDailyStreak() {
   // Run once per day: if yesterday had zero blocked attempts, increment streak. If yesterday had blocks, reset.
-  chrome.storage.local.get(['lastBlockedDate','currentStreak','streakLastUpdatedDate'], (res) => {
-    const lastBlocked = res.lastBlockedDate;
-    const streakUpdated = res.streakLastUpdatedDate;
-    const yesterday = yesterdayStr();
+  chrome.storage.local.get(
+    ["lastBlockedDate", "currentStreak", "streakLastUpdatedDate"],
+    (res) => {
+      const lastBlocked = res.lastBlockedDate;
+      const streakUpdated = res.streakLastUpdatedDate;
+      const yesterday = yesterdayStr();
 
-    if (streakUpdated === yesterday) return; // already processed
+      if (streakUpdated === yesterday) return; // already processed
 
-    if (lastBlocked === yesterday) {
-      // there was a block yesterday -> reset streak
-      chrome.storage.local.set({ currentStreak: 0, streakLastUpdatedDate: yesterday });
-    } else {
-      // no block yesterday -> increment streak
-      const newStreak = (res.currentStreak || 0) + 1;
-      chrome.storage.local.set({ currentStreak: newStreak, streakLastUpdatedDate: yesterday });
+      if (lastBlocked === yesterday) {
+        // there was a block yesterday -> reset streak
+        chrome.storage.local.set({
+          currentStreak: 0,
+          streakLastUpdatedDate: yesterday,
+        });
+      } else {
+        // no block yesterday -> increment streak
+        const newStreak = (res.currentStreak || 0) + 1;
+        chrome.storage.local.set({
+          currentStreak: newStreak,
+          streakLastUpdatedDate: yesterday,
+        });
+      }
     }
-  });
+  );
 }
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm && alarm.name === 'daily-streak') {
+  if (alarm && alarm.name === "daily-streak") {
     checkDailyStreak();
   }
 });
 
 chrome.runtime.onInstalled.addListener(async () => {
-  console.log('FocusGuard installed — Day 4');
+  console.log("FocusGuard installed — Day 4");
   await ensureStorage();
   restoreDynamicRules();
 
   try {
-    chrome.alarms.create('daily-streak', { periodInMinutes: 24 * 60 });
+    chrome.alarms.create("daily-streak", { periodInMinutes: 24 * 60 });
   } catch (e) {
-    console.warn('Failed to create daily alarm', e);
+    console.warn("Failed to create daily alarm", e);
   }
 
   // run once now to ensure state is up-to-date

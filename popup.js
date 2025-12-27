@@ -1,31 +1,40 @@
 // Popup (Day 3): show counts/last date and allow add/remove blocked domains via background
 function refreshCounts() {
-  chrome.storage.local.get(['violationCount', 'currentStreak', 'lastBlockedDate', 'streakLastUpdatedDate'], function (res) {
-    document.getElementById('count').textContent = res.violationCount || 0;
-    document.getElementById('streak').textContent = '🔥 Streak: ' + (res.currentStreak || 0);
-    var last = res.lastBlockedDate || '—';
-    var lastEl = document.getElementById('last');
-    if (!lastEl) {
-      lastEl = document.createElement('div');
-      lastEl.id = 'last';
-      lastEl.style.marginTop = '6px';
-      lastEl.style.color = '#666';
-      document.querySelector('body').appendChild(lastEl);
-    }
-    lastEl.textContent = '📅 Lần gần nhất: ' + last;
+  chrome.storage.local.get(
+    [
+      "violationCount",
+      "currentStreak",
+      "lastBlockedDate",
+      "streakLastUpdatedDate",
+    ],
+    function (res) {
+      document.getElementById("count").textContent = res.violationCount || 0;
+      document.getElementById("streak").textContent =
+        "🔥 Streak: " + (res.currentStreak || 0);
+      var last = res.lastBlockedDate || "—";
+      var lastEl = document.getElementById("last");
+      if (!lastEl) {
+        lastEl = document.createElement("div");
+        lastEl.id = "last";
+        lastEl.style.marginTop = "6px";
+        lastEl.style.color = "#666";
+        document.querySelector("body").appendChild(lastEl);
+      }
+      lastEl.textContent = "📅 Lần gần nhất: " + last;
 
-    var sChecked = res.streakLastUpdatedDate || '—';
-    var chkEl = document.getElementById('streak-checked');
-    if (!chkEl) {
-      chkEl = document.createElement('div');
-      chkEl.id = 'streak-checked';
-      chkEl.style.marginTop = '6px';
-      chkEl.style.color = '#666';
-      chkEl.style.fontSize = '12px';
-      document.querySelector('body').appendChild(chkEl);
+      var sChecked = res.streakLastUpdatedDate || "—";
+      var chkEl = document.getElementById("streak-checked");
+      if (!chkEl) {
+        chkEl = document.createElement("div");
+        chkEl.id = "streak-checked";
+        chkEl.style.marginTop = "6px";
+        chkEl.style.color = "#666";
+        chkEl.style.fontSize = "12px";
+        document.querySelector("body").appendChild(chkEl);
+      }
+      chkEl.textContent = "✅ Streak last checked: " + sChecked;
     }
-    chkEl.textContent = '✅ Streak last checked: ' + sChecked;
-  });
+  );
 }
 
 function refreshList() {

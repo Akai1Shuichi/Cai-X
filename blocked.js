@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
           violationCount: count,
           currentStreak: newStreak,
           lastBlockedDate: today,
-          streakLastUpdatedDate: today
+          streakLastUpdatedDate: today,
         },
         function () {
           var el = document.getElementById("count");
