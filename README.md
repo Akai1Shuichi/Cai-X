@@ -24,3 +24,13 @@ Day 2: Blocked page UI and counter/streak updates implemented. The blocked page 
 How to test Day 2:
 
 - Load the extension (see above), visit a blocked site, observe `blocked.html` shows updated counts and the popup reflects the new last blocked date. Day 3: Popup add/remove implemented. You can now add custom domains from the popup; the background service worker creates dynamic declarativeNetRequest rules for each added domain and persists them in `chrome.storage.local`. To test Day 3: add a domain (e.g., `example.com`) via the popup, verify it appears in the list, then visit `https://example.com` and confirm you are redirected to `blocked.html`. Removing a domain from the popup will remove the dynamic rule immediately.
+
+Day 4: Streak logic & polish UI implemented. Behavior:
+- A daily alarm checks whether *yesterday* had zero blocked attempts. If so, `currentStreak` is incremented by 1; if not, `currentStreak` is reset to 0.
+- `streakLastUpdatedDate` stores which day the streak was last processed to prevent double counting.
+- When a blocked attempt happens, streak is reset to 0 and `streakLastUpdatedDate` is set to today.
+
+How to test Day 4:
+- Reload the extension.
+- To simulate a block: visit a blocked domain; `currentStreak` should be reset to 0 and `lastBlockedDate` set to today.
+- To simulate a day with no blocks: manually set `lastBlockedDate` in `chrome.storage.local` to a date earlier than yesterday, then run `chrome.alarms.clear('daily-streak')` and `chrome.alarms.create('daily-streak', {when: Date.now() + 1000})` in the background console (or wait a day). After the alarm runs, `currentStreak` should increment and `streakLastUpdatedDate` should be set to yesterday.
