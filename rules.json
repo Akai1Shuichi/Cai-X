@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": { "extensionPath": "/blocked.html" }
+    },
+    "condition": {
+      "urlFilter": "||pornhub.com^",
+      "resourceTypes": ["main_frame"]
+    }
+  },
+  {
+    "id": 2,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": { "extensionPath": "/blocked.html" }
+    },
+    "condition": {
+      "urlFilter": "||xvideos.com^",
+      "resourceTypes": ["main_frame"]
+    }
+  },
+  {
+    "id": 3,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": { "extensionPath": "/blocked.html" }
+    },
+    "condition": {
+      "urlFilter": "||xhamster.com^",
+      "resourceTypes": ["main_frame"]
+    }
+  }
+]

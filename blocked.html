@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Blocked — FocusGuard</title>
+    <style>
+      body {
+        font-family: system-ui, Arial;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background: #fff;
+      }
+      .card {
+        max-width: 520px;
+        padding: 28px;
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        text-align: center;
+      }
+      .big {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .muted {
+        color: #666;
+        margin-bottom: 18px;
+      }
+      .count {
+        font-size: 36px;
+        font-weight: 700;
+        color: #e53935;
+      }
+      button {
+        margin-top: 18px;
+        padding: 10px 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="big">🚫 Website này đã bị chặn</div>
+      <div class="muted" id="note">
+        Chúng tôi đã ghi lại lần cố truy cập này.
+      </div>
+      <div>🔢 Lần phá luật: <span class="count" id="count">—</span></div>
+      <div id="streak" style="margin-top: 10px; color: #444">
+        🔥 Streak hiện tại: —
+      </div>
+      <button id="back">Quay lại an toàn</button>
+    </div>
+    <script src="blocked.js"></script>
+  </body>
+</html>
