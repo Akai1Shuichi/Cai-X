@@ -23,4 +23,4 @@ Day 2: Blocked page UI and counter/streak updates implemented. The blocked page 
 
 How to test Day 2:
 
-- Load the extension (see above), visit a blocked site, observe `blocked.html` shows updated counts and the popup reflects the new last blocked date. Next: Day 3 — allow adding sites from popup and persist dynamic rules.
+- Load the extension (see above), visit a blocked site, observe `blocked.html` shows updated counts and the popup reflects the new last blocked date. Day 3: Popup add/remove implemented. You can now add custom domains from the popup; the background service worker creates dynamic declarativeNetRequest rules for each added domain and persists them in `chrome.storage.local`. To test Day 3: add a domain (e.g., `example.com`) via the popup, verify it appears in the list, then visit `https://example.com` and confirm you are redirected to `blocked.html`. Removing a domain from the popup will remove the dynamic rule immediately.
