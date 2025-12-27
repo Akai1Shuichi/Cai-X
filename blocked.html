@@ -44,22 +44,42 @@
   <body>
     <div class="card">
       <div class="big">🚫 Website này đã bị chặn</div>
-      <div class="muted" id="note">Bạn đã cố truy cập vào trang bị chặn — chúng tôi đã ghi lại lần này để giúp bạn thắng chính mình.</div>
-
-      <div style="margin-top:16px">
-        <div style="font-size:13px;color:#666">🔢 Lần phá luật tổng: <span class="count" id="count">—</span></div>
-        <div style="font-size:13px;color:#666;margin-top:6px">🔥 Streak hiện tại: <span id="streak">—</span></div>
-        <div style="font-size:13px;color:#666;margin-top:6px" id="last">📅 Lần gần nhất: —</div>
+      <div class="muted" id="note">
+        Bạn đã cố truy cập vào trang bị chặn — chúng tôi đã ghi lại lần này để
+        giúp bạn thắng chính mình.
       </div>
 
-      <div style="margin-top:18px;font-weight:600;color:#333">“Hãy dừng lại — bạn có thể làm được.”</div>
+      <div style="margin-top: 16px">
+        <div style="font-size: 13px; color: #666">
+          🔢 Lần phá luật tổng: <span class="count" id="count">—</span>
+        </div>
+        <div style="font-size: 13px; color: #666; margin-top: 6px">
+          🔥 Streak hiện tại: <span id="streak">—</span>
+        </div>
+        <div style="font-size: 13px; color: #666; margin-top: 6px" id="last">
+          📅 Lần gần nhất: —
+        </div>
+      </div>
 
-      <div style="display:flex;gap:10px;justify-content:center;margin-top:18px">
+      <div style="margin-top: 18px; font-weight: 600; color: #333">
+        “Hãy dừng lại — bạn có thể làm được.”
+      </div>
+
+      <div
+        style="
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+          margin-top: 18px;
+        "
+      >
         <button id="back">Quay lại</button>
         <button id="start-focus">Bắt đầu phiên tập trung 25 phút</button>
       </div>
 
-      <div style="margin-top:12px;font-size:12px;color:#777">Bạn có thể thay đổi danh sách chặn trong extension popup.</div>
+      <div style="margin-top: 12px; font-size: 12px; color: #777">
+        Bạn có thể thay đổi danh sách chặn trong extension popup.
+      </div>
     </div>
     <script src="blocked.js"></script>
   </body>

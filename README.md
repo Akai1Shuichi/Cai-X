@@ -22,4 +22,5 @@ Notes / limitations (Day 1):
 Day 2: Blocked page UI and counter/streak updates implemented. The blocked page now shows a stronger message, attempted host (when available), total violation count, and last blocked date; on load it increments `violationCount`, resets `currentStreak` to 0, and sets `lastBlockedDate` to today.
 
 How to test Day 2:
+
 - Load the extension (see above), visit a blocked site, observe `blocked.html` shows updated counts and the popup reflects the new last blocked date. Next: Day 3 — allow adding sites from popup and persist dynamic rules.
