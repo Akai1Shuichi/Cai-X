@@ -46,41 +46,50 @@ function refreshList() {
     const defaults = res.defaults || [];
     const user = res.userBlocked || [];
 
-    // show defaults first
-    defaults.forEach((d) => {
-      const row = document.createElement("div");
-      row.style.display = "flex";
-      row.style.justifyContent = "space-between";
-      row.style.alignItems = "center";
-      row.style.padding = "4px 0";
-      const name = document.createElement("div");
-      name.className = "item";
-      name.textContent = d + " ";
-      const note = document.createElement("span");
-      note.style.color = "var(--muted)";
-      note.style.fontSize = "12px";
-      note.textContent = "(mặc định)";
-      name.appendChild(note);
-      row.appendChild(name);
-      listEl.appendChild(row);
+    // show first few defaults, add "Xem thêm" if there are more
+    const SHOW_DEFAULTS = 3;
+    const visible = defaults.slice(0, SHOW_DEFAULTS);
+    visible.forEach((d) => {
+      const item = document.createElement("div");
+      item.className = "site-item";
+      const name = document.createElement("span");
+      name.className = "site-name";
+      name.textContent = d;
+      const badge = document.createElement("span");
+      badge.className = "site-badge";
+      badge.textContent = "Mặc định";
+      item.appendChild(name);
+      item.appendChild(badge);
+      listEl.appendChild(item);
     });
+
+    if (defaults.length > SHOW_DEFAULTS) {
+      const moreItem = document.createElement("div");
+      moreItem.className = "site-item";
+      const moreBtn = document.createElement("button");
+      moreBtn.className = "view-more";
+      moreBtn.textContent = "Xem thêm danh sách mặc định";
+      moreBtn.addEventListener("click", () => {
+        chrome.tabs.create({ url: chrome.runtime.getURL("defaults.html") });
+      });
+      moreItem.appendChild(moreBtn);
+      listEl.appendChild(moreItem);
+    }
 
     // show user-added with remove buttons
     user.forEach((d) => {
-      const row = document.createElement("div");
-      row.style.display = "flex";
-      row.style.justifyContent = "space-between";
-      row.style.alignItems = "center";
-      row.style.padding = "4px 0";
-      const name = document.createElement("div");
-      name.className = "item";
+      const item = document.createElement("div");
+      item.className = "site-item";
+      const name = document.createElement("span");
+      name.className = "site-name";
       name.textContent = d;
       const btn = document.createElement("button");
+      btn.className = "remove-btn";
       btn.textContent = "X";
-      btn.style.marginLeft = "8px";
       btn.title = "Remove";
       btn.addEventListener("click", function () {
         btn.disabled = true;
+        const prev = btn.textContent;
         btn.textContent = "…";
         chrome.runtime.sendMessage(
           { action: "removeDomain", domain: d },
@@ -89,14 +98,14 @@ function refreshList() {
             else {
               alert("Không thể xóa: " + (resp && resp.error));
               btn.disabled = false;
-              btn.textContent = "X";
+              btn.textContent = prev;
             }
           }
         );
       });
-      row.appendChild(name);
-      row.appendChild(btn);
-      listEl.appendChild(row);
+      item.appendChild(name);
+      item.appendChild(btn);
+      listEl.appendChild(item);
     });
 
     if (defaults.length + user.length === 0) {

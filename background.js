@@ -1,5 +1,21 @@
 // Background service worker (Day 3): manage dynamic declarativeNetRequest rules and respond to popup
-const DEFAULT_DOMAINS = ["pornhub.com", "xvideos.com", "xhamster.com"];
+const DEFAULT_DOMAINS = [
+  "pornhub.com",
+  "xvideos.com",
+  "xhamster.com",
+  "xnxx.com",
+  "youporn.com",
+  "redtube.com",
+  "tube8.com",
+  "beeg.com",
+  "spankwire.com",
+  "tnaflix.com",
+  "motherless.com",
+  "sextube.com",
+  "porn.com",
+  "4tube.com",
+  "drtuber.com",
+];
 const DYNAMIC_RULE_ID_START = 1000;
 
 function makeRule(id, domain) {
