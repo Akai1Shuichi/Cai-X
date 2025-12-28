@@ -135,6 +135,7 @@ function yesterdayStr() {
 
 function checkDailyStreak() {
   // Run once per day: if yesterday had zero blocked attempts, increment streak. If yesterday had blocks, reset.
+  // Important: On first run (fresh install / missing streakLastUpdatedDate) do not increment to avoid setting streak to 1 by default.
   chrome.storage.local.get(
     ["lastBlockedDate", "currentStreak", "streakLastUpdatedDate"],
     (res) => {
@@ -142,7 +143,18 @@ function checkDailyStreak() {
       const streakUpdated = res.streakLastUpdatedDate;
       const yesterday = yesterdayStr();
 
-      if (streakUpdated === yesterday) return; // already processed
+      // if we've already processed yesterday, nothing to do
+      if (streakUpdated === yesterday) return;
+
+      // If streakLastUpdatedDate is missing (first run), initialize it to yesterday without incrementing
+      if (!streakUpdated) {
+        chrome.storage.local.set({
+          currentStreak:
+            typeof res.currentStreak === "number" ? res.currentStreak : 0,
+          streakLastUpdatedDate: yesterday,
+        });
+        return;
+      }
 
       if (lastBlocked === yesterday) {
         // there was a block yesterday -> reset streak
