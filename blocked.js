@@ -2,11 +2,11 @@
 function todayStr() {
   const d = new Date();
   return (
-    d.getFullYear() +
+    String(d.getDate()).padStart(2, "0") +
     "-" +
     String(d.getMonth() + 1).padStart(2, "0") +
     "-" +
-    String(d.getDate()).padStart(2, "0")
+    d.getFullYear()
   );
 }
 
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const l = document.getElementById("last");
         if (l && res.lastBlockedDate) {
-          l.textContent = "📅 Lần gần nhất: " + res.lastBlockedDate;
+          l.textContent = res.lastBlockedDate;
         }
 
         // Hiển thị domain bị chặn (nếu có) hoặc thông báo đang tập trung
@@ -85,8 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const ref = document.referrer;
           if (ref) {
             try {
-              const host = new URL(ref).hostname.replace("www.", "");
-              if (note) note.textContent = "Bạn vừa cố truy cập: " + host;
             } catch (_) {}
           }
           if (focusBtn) {

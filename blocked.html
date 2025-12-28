@@ -2,85 +2,240 @@
 <html lang="vi">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Blocked — FocusGuard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FocusGuard – Đã chặn</title>
     <style>
+      :root {
+        --bg: #020617;
+        --card: #020617;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --danger: #f87171;
+        --primary: #22c55e;
+        --border: rgba(255, 255, 255, 0.06);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: system-ui, Arial;
+        margin: 0;
+        min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100vh;
-        margin: 0;
-        background: #fff;
+        background: var(--bg);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        color: var(--text);
+        padding: 20px;
       }
+
       .card {
-        max-width: 520px;
-        padding: 28px;
-        border-radius: 8px;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        width: 100%;
+        max-width: 700px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.01)
+        );
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 32px;
         text-align: center;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
       }
-      .big {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 6px;
+
+      .icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        line-height: 1;
       }
-      .muted {
-        color: #666;
-        margin-bottom: 18px;
-      }
-      .count {
-        font-size: 36px;
+
+      h1 {
+        font-size: 24px;
+        margin: 0 0 8px;
         font-weight: 700;
-        color: #e53935;
+        letter-spacing: -0.02em;
       }
+
+      .subtitle {
+        font-size: 15px;
+        color: #cbd5e1;
+        margin-bottom: 28px;
+        line-height: 1.5;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+
+      .stat {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 12px;
+      }
+
+      .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1;
+        margin-bottom: 8px;
+        color: var(--text);
+      }
+
+      .stat-value.danger {
+        color: var(--danger);
+      }
+
+      .stat-label {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+      }
+
+      .last-time {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+
+      .quote {
+        margin: 24px 0 28px;
+        font-size: 15px;
+        color: #e0e7ff;
+        font-style: italic;
+        line-height: 1.6;
+        padding: 0 20px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
       button {
-        margin-top: 18px;
-        padding: 10px 14px;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+        font-family: inherit;
+      }
+
+      button#back {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+
+      button#back:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+      }
+
+      button#start-focus {
+        background: linear-gradient(135deg, var(--primary), #16a34a);
+        color: #052e16;
+        box-shadow: 0 4px 16px rgba(34, 197, 94, 0.25);
+      }
+
+      button#start-focus:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+        filter: grayscale(30%);
+      }
+
+      button[disabled]:hover {
+        transform: none;
+      }
+
+      .footer {
+        margin-top: 24px;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      @media (max-width: 480px) {
+        .card {
+          padding: 24px;
+        }
+
+        h1 {
+          font-size: 20px;
+        }
+
+        .stat-value {
+          font-size: 28px;
+        }
+
+        .actions {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
       }
     </style>
   </head>
   <body>
     <div class="card">
-      <div class="big">🚫 Website này đã bị chặn</div>
-      <div class="muted" id="note">
-        Bạn đã cố truy cập vào trang bị chặn — chúng tôi đã ghi lại lần này để
-        giúp bạn thắng chính mình.
+      <div class="icon">🚫</div>
+      <h1>Trang này đã bị chặn</h1>
+      <div class="subtitle" id="note">
+        Đây là khoảnh khắc bạn có thể chọn lại.
       </div>
 
-      <div style="margin-top: 16px">
-        <div style="font-size: 13px; color: #666">
-          🔢 Lần phá luật tổng: <span class="count" id="count">—</span>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value danger" id="count">—</div>
+          <div class="stat-label">Phá luật</div>
         </div>
-        <div style="font-size: 13px; color: #666; margin-top: 6px">
-          🔥 Streak hiện tại: <span id="streak">—</span>
+        <div class="stat">
+          <div class="stat-value" id="streak">—</div>
+          <div class="stat-label">Streak</div>
         </div>
-        <div style="font-size: 13px; color: #666; margin-top: 6px" id="last">
-          📅 Lần gần nhất: —
+        <div class="stat">
+          <div class="stat-value" id="last">—</div>
+          <div class="stat-label">Ngày gần nhất</div>
+          <div class="last-time" id="last-time"></div>
         </div>
       </div>
 
-      <div style="margin-top: 18px; font-weight: 600; color: #333">
-        “Hãy dừng lại — bạn có thể làm được.”
+      <div class="quote">
+        "Cơn thôi thúc chỉ kéo dài vài phút. Kỷ luật thì ở lại lâu hơn."
       </div>
 
-      <div
-        style="
-          display: flex;
-          gap: 10px;
-          justify-content: center;
-          margin-top: 18px;
-        "
-      >
-        <button id="back">Quay lại</button>
-        <button id="start-focus">Quay lại và làm việc trong 25 phút</button>
+      <div class="actions">
+        <button id="back">← Quay lại</button>
+        <button id="start-focus">🎯 Tập trung 25 phút</button>
       </div>
 
-      <div style="margin-top: 12px; font-size: 12px; color: #777">
-        Bạn có thể thay đổi danh sách chặn trong extension popup.
-      </div>
+      <div class="footer">FocusGuard · Bạn đang xây kỷ luật cho chính mình</div>
     </div>
+
     <script src="blocked.js"></script>
   </body>
 </html>

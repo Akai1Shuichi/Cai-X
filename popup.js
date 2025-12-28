@@ -10,7 +10,7 @@ function refreshCounts() {
     function (res) {
       document.getElementById("count").textContent = res.violationCount || 0;
       document.getElementById("streak").textContent =
-        "🔥 Streak: " + (res.currentStreak || 0);
+        "🔥 " + (res.currentStreak || 0);
       var last = res.lastBlockedDate || "—";
       var lastEl = document.getElementById("last");
       if (!lastEl) {
