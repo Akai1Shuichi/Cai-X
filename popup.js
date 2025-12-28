@@ -53,10 +53,15 @@ function refreshList() {
       row.style.justifyContent = "space-between";
       row.style.alignItems = "center";
       row.style.padding = "4px 0";
-      row.innerHTML =
-        '<div style="color:#333">' +
-        d +
-        ' <span style="color:#888;font-size:12px">(mặc định)</span></div>';
+      const name = document.createElement("div");
+      name.className = "item";
+      name.textContent = d + " ";
+      const note = document.createElement("span");
+      note.style.color = "var(--muted)";
+      note.style.fontSize = "12px";
+      note.textContent = "(mặc định)";
+      name.appendChild(note);
+      row.appendChild(name);
       listEl.appendChild(row);
     });
 
@@ -68,6 +73,7 @@ function refreshList() {
       row.style.alignItems = "center";
       row.style.padding = "4px 0";
       const name = document.createElement("div");
+      name.className = "item";
       name.textContent = d;
       const btn = document.createElement("button");
       btn.textContent = "X";
@@ -111,19 +117,65 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  document.getElementById("add").addEventListener("click", function () {
-    var site = document.getElementById("site").value.trim();
-    if (!site) return alert("Nhập domain (ví dụ: example.com)");
-    document.getElementById("add").disabled = true;
+  const addBtn = document.getElementById("add");
+  const siteInput = document.getElementById("site");
+  function showInlineError(msg) {
+    let err = document.getElementById("add-error");
+    if (!err) {
+      err = document.createElement("div");
+      err.id = "add-error";
+      err.style.color = "#f87171";
+      err.style.marginTop = "8px";
+      err.style.fontSize = "13px";
+      // Insert after the add button in its parent to avoid NotFoundError when
+      // the add button is not a direct child of <body>. Fallback to document.body.
+      const parent = (addBtn && addBtn.parentNode) || document.body;
+      parent.insertBefore(err, (addBtn && addBtn.nextSibling) || null);
+    }
+    err.textContent = msg;
+  }
+
+  addBtn.addEventListener("click", function () {
+    const siteRaw = siteInput.value.trim();
+    if (!siteRaw) return showInlineError("Nhập domain (ví dụ: example.com)");
+
+    // normalize input to a bare host
+    let domain = siteRaw
+      .replace(/^(https?:\/\/)/i, "")
+      .split("/")[0]
+      .toLowerCase();
+    if (domain.startsWith("www.")) domain = domain.slice(4);
+
+    // basic validation
+    if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain))
+      return showInlineError("Domain không hợp lệ");
+
+    addBtn.disabled = true;
+    const prevText = addBtn.textContent;
+    addBtn.textContent = "Đang thêm…";
+
+    let timedOut = false;
+    const timeoutId = setTimeout(() => {
+      timedOut = true;
+      addBtn.disabled = false;
+      addBtn.textContent = prevText;
+      showInlineError("Không phản hồi — thử lại.");
+    }, 6000);
+
     chrome.runtime.sendMessage(
-      { action: "addDomain", domain: site },
+      { action: "addDomain", domain: domain },
       function (resp) {
-        document.getElementById("add").disabled = false;
+        clearTimeout(timeoutId);
+        if (timedOut) return; // ignore late responses
+        addBtn.disabled = false;
+        addBtn.textContent = prevText;
         if (resp && resp.ok) {
-          document.getElementById("site").value = "";
+          siteInput.value = "";
+          const errEl = document.getElementById("add-error");
+          if (errEl) errEl.remove();
           refreshList();
         } else {
-          alert("Không thể thêm: " + (resp && resp.error));
+          showInlineError("Không thể thêm: " + (resp && resp.error));
         }
       }
     );

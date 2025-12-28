@@ -62,17 +62,34 @@ async function restoreDynamicRules() {
     const mapping = res.dynamicRules || {};
     const rules = [];
     for (const [domain, id] of Object.entries(mapping)) {
-      rules.push(makeRule(id, domain));
+      rules.push(makeRule(Number(id), domain));
     }
     if (rules.length) {
-      try {
-        chrome.declarativeNetRequest.updateDynamicRules({
-          addRules: rules,
-          removeRuleIds: [],
-        });
-      } catch (e) {
-        console.warn("Failed to restore dynamic rules", e);
-      }
+      // Avoid attempting to add rules with IDs that are already present
+      chrome.declarativeNetRequest.getDynamicRules((installed) => {
+        const installedIds = new Set(
+          (installed || []).map((r) => Number(r.id))
+        );
+        const filtered = rules.filter((r) => !installedIds.has(Number(r.id)));
+        if (!filtered.length) return;
+        if (filtered.length !== rules.length) {
+          const skipped = rules
+            .filter((r) => installedIds.has(Number(r.id)))
+            .map((r) => r.id);
+          console.warn(
+            "Skipping restore for already-installed rule IDs:",
+            skipped
+          );
+        }
+        try {
+          chrome.declarativeNetRequest.updateDynamicRules({
+            addRules: filtered,
+            removeRuleIds: [],
+          });
+        } catch (e) {
+          console.warn("Failed to restore dynamic rules", e);
+        }
+      });
     }
   });
 }
@@ -172,27 +189,41 @@ function addDomain(domain) {
       if (user.includes(domain) || mapping[domain])
         return reject("Domain already added");
 
-      const id = nextDynamicId(mapping);
-      const rule = makeRule(id, domain);
+      // Determine a safe unique id by looking at both stored mapping and currently installed dynamic rules
+      chrome.declarativeNetRequest.getDynamicRules((installed) => {
+        const installedIds = (installed || [])
+          .map((r) => Number(r.id))
+          .filter((n) => !isNaN(n));
+        const storedIds = Object.values(mapping)
+          .map(Number)
+          .filter((n) => !isNaN(n));
+        const allIds = installedIds.concat(storedIds);
+        const max = allIds.length
+          ? Math.max(...allIds)
+          : DYNAMIC_RULE_ID_START - 1;
+        const id = max + 1;
+        const rule = makeRule(id, domain);
 
-      try {
-        chrome.declarativeNetRequest.updateDynamicRules(
-          { addRules: [rule], removeRuleIds: [] },
-          () => {
-            // update storage mapping
-            mapping[domain] = id;
-            user.push(domain);
-            chrome.storage.local.set(
-              { userBlockedDomains: user, dynamicRules: mapping },
-              () => {
-                resolve({ domain, id });
-              }
-            );
-          }
-        );
-      } catch (e) {
-        reject("Failed to add rule: " + e.message);
-      }
+        try {
+          chrome.declarativeNetRequest.updateDynamicRules(
+            { addRules: [rule], removeRuleIds: [] },
+            () => {
+              // update storage mapping
+              mapping[domain] = id;
+              user.push(domain);
+              chrome.storage.local.set(
+                { userBlockedDomains: user, dynamicRules: mapping },
+                () => {
+                  console.log("Added dynamic rule", domain, id);
+                  resolve({ domain, id });
+                }
+              );
+            }
+          );
+        } catch (e) {
+          reject("Failed to add rule: " + e.message);
+        }
+      });
     });
   });
 }
