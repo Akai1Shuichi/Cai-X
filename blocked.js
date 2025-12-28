@@ -26,6 +26,15 @@ function isRealBlockedHit() {
   return true;
 }
 
+function isInFocusSession(callback) {
+  chrome.storage.local.get(["focusSession"], (res) => {
+    const fs = res.focusSession;
+    if (!fs) return callback(false);
+    if (Date.now() > fs.endsAt) return callback(false);
+    callback(true);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   chrome.storage.local.get(
     ["violationCount", "currentStreak", "lastBlockedDate"],
@@ -34,43 +43,88 @@ document.addEventListener("DOMContentLoaded", () => {
       let streak = res.currentStreak || 0;
       const today = todayStr();
 
-      // ✅ CHỈ TĂNG KHI TRUY CẬP TRANG CẤM
-      if (isRealBlockedHit()) {
-        count += 1;
-        streak = 0;
+      // Nếu đang trong phiên tập trung → KHÔNG tăng violation
+      isInFocusSession((inFocus) => {
+        if (!inFocus && isRealBlockedHit()) {
+          count += 1;
+          streak = 0;
 
-        chrome.storage.local.set({
-          violationCount: count,
-          currentStreak: streak,
-          lastBlockedDate: today,
-        });
-      }
+          chrome.storage.local.set({
+            violationCount: count,
+            currentStreak: streak,
+            lastBlockedDate: today,
+          });
+        }
 
-      // Render UI
-      const c = document.getElementById("count");
-      if (c) c.textContent = count;
+        // Render UI
+        const c = document.getElementById("count");
+        if (c) c.textContent = count;
 
-      const s = document.getElementById("streak");
-      if (s) s.textContent = streak;
+        const s = document.getElementById("streak");
+        if (s) s.textContent = streak;
 
-      const l = document.getElementById("last");
-      if (l && res.lastBlockedDate) {
-        l.textContent = "📅 Lần gần nhất: " + res.lastBlockedDate;
-      }
+        const l = document.getElementById("last");
+        if (l && res.lastBlockedDate) {
+          l.textContent = "📅 Lần gần nhất: " + res.lastBlockedDate;
+        }
 
-      // Hiển thị domain bị chặn (nếu có)
-      const ref = document.referrer;
-      if (ref) {
-        try {
-          const host = new URL(ref).hostname.replace("www.", "");
-          const note = document.getElementById("note");
-          if (note) note.textContent = "Bạn vừa cố truy cập: " + host;
-        } catch (_) {}
-      }
+        // Hiển thị domain bị chặn (nếu có) hoặc thông báo đang tập trung
+        const note = document.getElementById("note");
+        const focusBtn = document.getElementById("start-focus");
+        if (inFocus) {
+          if (note)
+            note.textContent =
+              "Bạn đang bật chế độ tập trung, hãy quay lại làm việc.";
+
+          if (focusBtn) {
+            focusBtn.textContent = "⏳ Đang tập trung...";
+            focusBtn.disabled = true;
+            focusBtn.setAttribute("aria-disabled", "true");
+          }
+        } else {
+          const ref = document.referrer;
+          if (ref) {
+            try {
+              const host = new URL(ref).hostname.replace("www.", "");
+              if (note) note.textContent = "Bạn vừa cố truy cập: " + host;
+            } catch (_) {}
+          }
+          if (focusBtn) {
+            focusBtn.textContent = "Quay lại và làm việc trong 25 phút";
+            focusBtn.disabled = false;
+            focusBtn.removeAttribute("aria-disabled");
+          }
+        }
+      });
     }
   );
 
   // nút quay lại
   const backBtn = document.getElementById("back");
   if (backBtn) backBtn.addEventListener("click", () => window.close());
+
+  // nút bật phiên tập trung — tạo focusSession và đóng tab
+  const focusBtn = document.getElementById("start-focus");
+  if (focusBtn) {
+    focusBtn.addEventListener("click", () => {
+      const now = Date.now();
+      const duration = 25 * 60 * 1000; // 25 phút
+
+      chrome.storage.local.set(
+        {
+          focusSession: {
+            startedAt: now,
+            endsAt: now + duration,
+            source: "blocked_page",
+          },
+        },
+        () => {
+          focusBtn.textContent = "⏳ Đang tập trung...";
+          setTimeout(() => {
+            window.close(); // cắt kích thích
+          }, 400);
+        }
+      );
+    });
+  }
 });
