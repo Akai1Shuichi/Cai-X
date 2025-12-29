@@ -181,7 +181,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 chrome.runtime.onInstalled.addListener(async () => {
-  console.log("FocusGuard installed — Day 4");
   await ensureStorage();
   restoreDynamicRules();
 
@@ -236,19 +235,40 @@ function addDomain(domain) {
           chrome.declarativeNetRequest.updateDynamicRules(
             { addRules: [rule], removeRuleIds: [] },
             () => {
+              if (chrome.runtime.lastError) {
+                console.error(
+                  "[addDomain] Failed to add rule:",
+                  chrome.runtime.lastError
+                );
+                return reject(
+                  "Failed to add rule: " + chrome.runtime.lastError.message
+                );
+              }
+
               // update storage mapping
               mapping[domain] = id;
               user.push(domain);
+
               chrome.storage.local.set(
                 { userBlockedDomains: user, dynamicRules: mapping },
                 () => {
-                  console.log("Added dynamic rule", domain, id);
+                  if (chrome.runtime.lastError) {
+                    console.error(
+                      "[addDomain] Failed to save storage:",
+                      chrome.runtime.lastError
+                    );
+                    return reject(
+                      "Failed to save storage: " +
+                        chrome.runtime.lastError.message
+                    );
+                  }
                   resolve({ domain, id });
                 }
               );
             }
           );
         } catch (e) {
+          console.error("[addDomain] Exception:", e);
           reject("Failed to add rule: " + e.message);
         }
       });
@@ -259,31 +279,77 @@ function addDomain(domain) {
 function removeDomain(domain) {
   return new Promise((resolve, reject) => {
     domain = normalizeDomain(domain);
+
     chrome.storage.local.get(["userBlockedDomains", "dynamicRules"], (res) => {
       const user = res.userBlockedDomains || [];
       const mapping = res.dynamicRules || {};
-      const id = mapping[domain];
-      if (!id) return reject("Domain not found");
 
-      try {
-        chrome.declarativeNetRequest.updateDynamicRules(
-          { addRules: [], removeRuleIds: [Number(id)] },
-          () => {
-            // update storage mapping
-            delete mapping[domain];
-            const idx = user.indexOf(domain);
-            if (idx !== -1) user.splice(idx, 1);
-            chrome.storage.local.set(
-              { userBlockedDomains: user, dynamicRules: mapping },
-              () => {
-                resolve({ domain, id });
-              }
-            );
-          }
-        );
-      } catch (e) {
-        reject("Failed to remove rule: " + e.message);
+      const id = mapping[domain];
+      if (!id) {
+        return reject("Domain not found");
       }
+
+      const numId = Number(id);
+
+      // Get ALL rules (both dynamic and static) to see the full picture
+      chrome.declarativeNetRequest.getDynamicRules((dynamicRules) => {
+        chrome.declarativeNetRequest.getSessionRules((sessionRules) => {
+          const allRuleIds = [...dynamicRules, ...sessionRules].map(
+            (r) => r.id
+          );
+
+          // Try to remove from BOTH dynamic and session rules
+          Promise.all([
+            new Promise((res) => {
+              chrome.declarativeNetRequest.updateDynamicRules(
+                { addRules: [], removeRuleIds: [numId] },
+                () => {
+                  res();
+                }
+              );
+            }),
+            new Promise((res) => {
+              chrome.declarativeNetRequest.updateSessionRules(
+                { addRules: [], removeRuleIds: [numId] },
+                () => {
+                  res();
+                }
+              );
+            }),
+          ]).then(() => {
+            // Wait a bit for the removal to take effect
+            setTimeout(() => {
+              // Verify removal
+              chrome.declarativeNetRequest.getDynamicRules((afterDynamic) => {
+                chrome.declarativeNetRequest.getSessionRules((afterSession) => {
+                  const afterIds = [...afterDynamic, ...afterSession].map(
+                    (r) => r.id
+                  );
+
+                  if (afterIds.includes(numId)) {
+                    console.error(
+                      `[removeDomain] Rule ${numId} STILL EXISTS after removal!`
+                    );
+                    // Continue anyway and clean up storage
+                  }
+
+                  // Update storage
+                  delete mapping[domain];
+                  const idx = user.indexOf(domain);
+                  if (idx !== -1) user.splice(idx, 1);
+
+                  chrome.storage.local.set(
+                    { userBlockedDomains: user, dynamicRules: mapping },
+                    () => {
+                      resolve({ domain, id: numId });
+                    }
+                  );
+                });
+              });
+            }, 100); // Small delay to ensure removal propagates
+          });
+        });
+      });
     });
   });
 }
