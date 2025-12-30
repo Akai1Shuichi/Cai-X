@@ -1,4 +1,15 @@
 // Popup (Day 3): show counts/last date and allow add/remove blocked domains via background
+// Helper: Ensure dd/mm/yyyy format
+function formatDate(str) {
+  if (!str) return "—";
+  // If in yyyy-mm-dd format, convert to dd/mm/yyyy
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    const [y, m, d] = str.split("-");
+    return `${d}/${m}/${y}`;
+  }
+  return str;
+}
+
 function refreshCounts() {
   chrome.storage.local.get(
     [
@@ -18,7 +29,7 @@ function refreshCounts() {
         focusEl.textContent = res.focusCount || 0;
       }
 
-      var last = res.lastBlockedDate || "—";
+      var last = formatDate(res.lastBlockedDate);
       var lastEl = document.getElementById("last");
       if (!lastEl) {
         lastEl = document.createElement("div");
@@ -29,7 +40,7 @@ function refreshCounts() {
       }
       lastEl.textContent = "📅 Lần gần nhất: " + last;
 
-      var sChecked = res.streakLastUpdatedDate || "—";
+      var sChecked = formatDate(res.streakLastUpdatedDate);
       var chkEl = document.getElementById("streak-checked");
       if (!chkEl) {
         chkEl = document.createElement("div");

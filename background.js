@@ -113,11 +113,11 @@ async function restoreDynamicRules() {
 function todayStr() {
   const d = new Date();
   return (
-    d.getFullYear() +
-    "-" +
+    String(d.getDate()).padStart(2, "0") +
+    "/" +
     String(d.getMonth() + 1).padStart(2, "0") +
-    "-" +
-    String(d.getDate()).padStart(2, "0")
+    "/" +
+    d.getFullYear()
   );
 }
 
@@ -125,11 +125,11 @@ function yesterdayStr() {
   const d = new Date();
   d.setDate(d.getDate() - 1);
   return (
-    d.getFullYear() +
-    "-" +
+    String(d.getDate()).padStart(2, "0") +
+    "/" +
     String(d.getMonth() + 1).padStart(2, "0") +
-    "-" +
-    String(d.getDate()).padStart(2, "0")
+    "/" +
+    d.getFullYear()
   );
 }
 
@@ -259,7 +259,7 @@ function addDomain(domain) {
                     );
                     return reject(
                       "Failed to save storage: " +
-                        chrome.runtime.lastError.message
+                      chrome.runtime.lastError.message
                     );
                   }
                   resolve({ domain, id });
