@@ -1,4 +1,4 @@
-# FocusGuard — MVP (Day 1)
+# Cai X — MVP (Day 1)
 
 What's included (Day 1):
 
@@ -42,6 +42,6 @@ Day 5: Test & local packaging
 
 Packaging locally:
 
-- Create a zip of the `extension/` folder for sharing or local load: `cd extension && zip -r ../focusguard.zip .`
+- Create a zip of the `extension/` folder for sharing or local load: `cd extension && zip -r ../cai-x.zip .`
 - To simulate a block: visit a blocked domain; `currentStreak` should be reset to 0 and `lastBlockedDate` set to today.
 - To simulate a day with no blocks: manually set `lastBlockedDate` in `chrome.storage.local` to a date earlier than yesterday, then run `chrome.alarms.clear('daily-streak')` and `chrome.alarms.create('daily-streak', {when: Date.now() + 1000})` in the background console (or wait a day). After the alarm runs, `currentStreak` should increment and `streakLastUpdatedDate` should be set to yesterday.

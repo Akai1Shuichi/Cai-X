@@ -41,7 +41,7 @@ Packaging for local distribution
 - Create a zip of the extension folder (exclude dev files if desired) and share that zip for local load:
 
   cd extension
-  zip -r ../focusguard.zip .
+  zip -r ../cai-x.zip .
 
 - The recipient can load the zip by extracting and using "Load unpacked" in the extensions page.
 

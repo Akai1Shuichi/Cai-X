@@ -36,7 +36,6 @@ function isRealBlockedHit() {
 
   // QUAN TRỌNG: Phải có ?hit=1 trong URL
   if (params.get("hit") !== "1") {
-    console.log("[FocusGuard] No hit=1 parameter, skipping count");
     return false;
   }
 
@@ -46,13 +45,9 @@ function isRealBlockedHit() {
     if (entries && entries.length) {
       const nav = entries[0];
       if (nav.type === "reload") {
-        console.log("[FocusGuard] Page reload detected, skipping count");
         return false;
       }
     } else if (performance.navigation && performance.navigation.type === 1) {
-      console.log(
-        "[FocusGuard] Page reload detected (fallback), skipping count"
-      );
       return false;
     }
   } catch (_) {}
@@ -60,11 +55,9 @@ function isRealBlockedHit() {
   // Kiểm tra referrer - nếu là extension page thì skip
   const ref = document.referrer || "";
   if (ref.includes("chrome-extension://") && ref.includes("blocked.html")) {
-    console.log("[FocusGuard] Self-referrer detected, skipping count");
     return false;
   }
 
-  console.log("[FocusGuard] Real blocked hit detected ✓");
   return true;
 }
 
@@ -83,7 +76,6 @@ function clearHitParameter() {
   if (url.searchParams.has("hit")) {
     url.searchParams.delete("hit");
     window.history.replaceState({}, "", url.toString());
-    console.log("[FocusGuard] Cleared hit parameter from URL");
   }
 }
 
@@ -109,8 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
             currentStreak: streak,
             lastBlockedDate: today,
           });
-
-          console.log("[FocusGuard] Violation counted:", count);
         }
 
         // Xóa ?hit=1 sau khi đã xử lý
