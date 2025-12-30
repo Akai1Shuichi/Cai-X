@@ -6,11 +6,18 @@ function refreshCounts() {
       "currentStreak",
       "lastBlockedDate",
       "streakLastUpdatedDate",
+      "focusCount",
     ],
     function (res) {
       document.getElementById("count").textContent = res.violationCount || 0;
       document.getElementById("streak").textContent =
         "🔥 " + (res.currentStreak || 0);
+
+      const focusEl = document.getElementById("focus-count");
+      if (focusEl) {
+        focusEl.textContent = res.focusCount || 0;
+      }
+
       var last = res.lastBlockedDate || "—";
       var lastEl = document.getElementById("last");
       if (!lastEl) {
@@ -29,10 +36,9 @@ function refreshCounts() {
         chkEl.id = "streak-checked";
         chkEl.style.marginTop = "6px";
         chkEl.style.color = "#666";
-        chkEl.style.fontSize = "12px";
         document.querySelector("body").appendChild(chkEl);
       }
-      chkEl.textContent = "✅ Streak last checked: " + sChecked;
+      chkEl.textContent = "✅ Lần streak gần nhất: " + sChecked;
     }
   );
 }

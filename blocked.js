@@ -26,7 +26,7 @@ function formatLastTime(dateStr) {
       if (diffDays < 7) return `${diffDays} ngày trước`;
       return dateStr;
     }
-  } catch (_) {}
+  } catch (_) { }
   return dateStr;
 }
 
@@ -50,7 +50,7 @@ function isRealBlockedHit() {
     } else if (performance.navigation && performance.navigation.type === 1) {
       return false;
     }
-  } catch (_) {}
+  } catch (_) { }
 
   // Kiểm tra referrer - nếu là extension page thì skip
   const ref = document.referrer || "";
@@ -81,7 +81,7 @@ function clearHitParameter() {
 
 document.addEventListener("DOMContentLoaded", () => {
   chrome.storage.local.get(
-    ["violationCount", "currentStreak", "lastBlockedDate"],
+    ["violationCount", "currentStreak", "lastBlockedDate", "focusCount"],
     (res) => {
       let count = res.violationCount || 0;
       let streak = res.currentStreak || 0;
@@ -114,6 +114,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const streakEl = document.getElementById("streak");
         if (streakEl) streakEl.textContent = streak;
+
+        const focusEl = document.getElementById("focus-count");
+        if (focusEl) focusEl.textContent = res.focusCount || 0;
 
         const lastDayEl = document.getElementById("last-day");
         if (lastDayEl) {
@@ -184,10 +187,10 @@ document.addEventListener("DOMContentLoaded", () => {
           },
         },
         () => {
-          // Tăng streak khi bắt đầu focus session
-          chrome.storage.local.get(["currentStreak"], (res) => {
-            const newStreak = (res.currentStreak || 0) + 1;
-            chrome.storage.local.set({ currentStreak: newStreak });
+          // Tăng focusCount thay vì streak
+          chrome.storage.local.get(["focusCount"], (res) => {
+            const next = (res.focusCount || 0) + 1;
+            chrome.storage.local.set({ focusCount: next });
           });
 
           focusBtn.textContent = "⏳ Đang tập trung...";
