@@ -197,6 +197,66 @@
         width: 100%;
       }
     }
+
+    /* Social Footer */
+    .social-footer {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .footer-right {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .social-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .social-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .social-icon {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+
+    .social-icon.emoji {
+      font-size: 16px;
+      width: auto;
+      height: auto;
+    }
+
+    .social-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .social-link:hover {
+      color: var(--text);
+    }
   </style>
 </head>
 
@@ -235,7 +295,30 @@
       <button id="start-focus">🎯 Tập trung 25 phút</button>
     </div>
 
-    <div class="footer">Cai X · Bạn đang xây kỷ luật cho chính mình</div>
+    <footer class="social-footer">
+      <div class="footer-right">
+        <div class="social-item">
+          <img src="images/facebook.png" alt="Facebook" class="social-icon" />
+          <a href="https://www.facebook.com/profile.php?id=61567027726244" target="_blank" class="social-link"
+            title="Fanpage : Thích Lập Trình">
+            Thích Lập Trình
+          </a>
+        </div>
+        <div class="social-item">
+          <img src="images/tiktok.png" alt="TikTok" class="social-icon" />
+          <a href="https://www.tiktok.com/@motphanmem" target="_blank" class="social-link" title="Tiktok: @motphanmem">
+            @motphanmem
+          </a>
+        </div>
+        <div class="social-item">
+          <span class="social-icon emoji">☕</span>
+          <a href="https://donate-trtoan.vercel.app/" target="_blank" class="social-link" title="Donate ủng hộ tác giả">
+            Donate
+          </a>
+        </div>
+      </div>
+      <div class="footer" style="margin-top: 16px;">Cai X · Bạn đang xây kỷ luật cho chính mình</div>
+    </footer>
   </div>
 
   <script src="blocked.js"></script>
