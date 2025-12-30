@@ -1,10 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "Cai X - Minimal MVP",
-  "version": "0.1.0",
-  "description": "Create friction to help you resist visiting sites you want to avoid.",
-  "permissions": ["storage", "declarativeNetRequest", "alarms"],
-  "host_permissions": ["<all_urls>"],
+  "name": "Cai X",
+  "version": "1.0.0",
+  "description": "Hỗ trợ bạn tự kiểm soát thói quen và xây kỷ luật mỗi ngày.",
+  "permissions": [
+    "storage",
+    "declarativeNetRequest",
+    "alarms"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "background": {
     "service_worker": "background.js"
   },
@@ -23,8 +29,19 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["blocked.html", "blocked.js"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "blocked.html",
+        "blocked.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
-  ]
+  ],
+  "icons": {
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  }
 }
